@@ -1,0 +1,50 @@
+# Secrets & credentials
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+.env
+.env.local
+.env.*.local
+gcp-key*
+service-account*.json
+credentials/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes / data
+data/
+volumes/
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/
+
+# Ollama models
+models/
+
+# Node
+node_modules/
