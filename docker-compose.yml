@@ -80,6 +80,44 @@ services:
     networks:
       - ai-stack
 
+  mcp-server:
+    build: ./mcp-server
+    container_name: mcp-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${GCP_KEY_HOST_PATH}:/gcp/gcp-key.json:ro
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_LOCATION=${GCP_LOCATION}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - RAG_CORPUS_NAME=${RAG_CORPUS_NAME}
+    networks:
+      - ai-stack
+
+  agent:
+    build: ./agent
+    container_name: agent
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - ${GCP_KEY_HOST_PATH}:/gcp/gcp-key.json:ro
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_LOCATION=${GCP_LOCATION}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - GOOGLE_GENAI_USE_VERTEXAI=True
+      - GOOGLE_CLOUD_PROJECT=${GCP_PROJECT_ID}
+      - GOOGLE_CLOUD_LOCATION=${GCP_LOCATION}
+      - MCP_SERVER_URL=http://mcp-server:8080/mcp
+      - AGENT_MODEL=gemini-2.5-flash
+    depends_on:
+      - mcp-server
+    networks:
+      - ai-stack
+
 volumes:
   openwebui-data:
   postgres-data:

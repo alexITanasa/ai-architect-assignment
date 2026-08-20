@@ -1,0 +1,2 @@
+fastmcp==2.11.3
+google-cloud-aiplatform>=1.90.0
