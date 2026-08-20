@@ -1,4 +1,22 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - ai-stack
+
   litellm:
     image: ghcr.io/berriai/litellm:main-stable
     container_name: litellm
@@ -14,9 +32,14 @@ services:
       - GCP_PROJECT_ID=${GCP_PROJECT_ID}
       - GCP_LOCATION=${GCP_LOCATION}
       - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - DATABASE_URL=${DATABASE_URL}
+      - STORE_MODEL_IN_DB=True
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - ai-stack
 
@@ -39,8 +62,28 @@ services:
     networks:
       - ai-stack
 
+  usage-extractor:
+    build: ./usage-extractor
+    container_name: usage-extractor
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - usage-data:/data
+    environment:
+      - LITELLM_BASE_URL=http://litellm:4000
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - DB_PATH=/data/usage.db
+      - FETCH_INTERVAL_SECONDS=60
+    depends_on:
+      - litellm
+    networks:
+      - ai-stack
+
 volumes:
   openwebui-data:
+  postgres-data:
+  usage-data:
 
 networks:
   ai-stack:

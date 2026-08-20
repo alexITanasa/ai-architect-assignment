@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LiteLLM Usage Extractor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0e1116;
+      color: #e6edf3;
+      margin: 0;
+      padding: 24px;
+    }
+    h1 { margin: 0 0 8px 0; }
+    .subtitle { color: #7d8590; margin-bottom: 32px; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .kpi { background: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 8px; }
+    .kpi-label { color: #7d8590; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 28px; font-weight: 600; margin-top: 8px; }
+    .section { margin-bottom: 32px; }
+    h2 { font-size: 16px; margin: 0 0 12px 0; color: #e6edf3; }
+    table { width: 100%; border-collapse: collapse; background: #161b22; border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #21262d; font-size: 13px; }
+    th { background: #1c2128; color: #7d8590; font-weight: 500; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+    tr:last-child td { border-bottom: none; }
+    .actions { margin-bottom: 24px; }
+    .actions a { color: #58a6ff; text-decoration: none; margin-right: 16px; font-size: 13px; }
+    .actions a:hover { text-decoration: underline; }
+    .num { font-variant-numeric: tabular-nums; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>LiteLLM Usage</h1>
+  <div class="subtitle">Aggregated from LiteLLM /spend/logs</div>
+
+  <div class="actions">
+    <a href="/api/summary">JSON: summary</a>
+    <a href="/api/usage">JSON: raw logs</a>
+    <a href="/api/export.csv">Download CSV</a>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-label">Requests</div>
+      <div class="kpi-value num">{{ summary.kpis.total_requests }}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total spend (USD)</div>
+      <div class="kpi-value num">${{ "%.4f"|format(summary.kpis.total_spend) }}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total tokens</div>
+      <div class="kpi-value num">{{ summary.kpis.total_tokens }}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg latency (ms)</div>
+      <div class="kpi-value num">{{ "%.0f"|format(summary.kpis.avg_duration_ms) }}</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>By model</h2>
+    <table>
+      <thead>
+        <tr><th>Model</th><th>Requests</th><th>Spend (USD)</th><th>Tokens</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.by_model %}
+        <tr>
+          <td>{{ row.model_group or "(unknown)" }}</td>
+          <td class="num">{{ row.requests }}</td>
+          <td class="num">${{ "%.4f"|format(row.spend) }}</td>
+          <td class="num">{{ row.tokens }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>By user</h2>
+    <table>
+      <thead>
+        <tr><th>User</th><th>Requests</th><th>Spend (USD)</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.by_user %}
+        <tr>
+          <td class="mono">{{ row.user_id or "(anon)" }}</td>
+          <td class="num">{{ row.requests }}</td>
+          <td class="num">${{ "%.4f"|format(row.spend) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Last 7 days</h2>
+    <table>
+      <thead>
+        <tr><th>Day</th><th>Requests</th><th>Spend (USD)</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.by_day %}
+        <tr>
+          <td class="mono">{{ row.day }}</td>
+          <td class="num">{{ row.requests }}</td>
+          <td class="num">${{ "%.4f"|format(row.spend) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Recent requests</h2>
+    <table>
+      <thead>
+        <tr><th>Time</th><th>Model</th><th>User</th><th>Tokens</th><th>Spend</th><th>Latency</th></tr>
+      </thead>
+      <tbody>
+        {% for row in recent %}
+        <tr>
+          <td class="mono">{{ row.start_time }}</td>
+          <td>{{ row.model_group or row.model }}</td>
+          <td class="mono">{{ row.user_id }}</td>
+          <td class="num">{{ row.total_tokens }}</td>
+          <td class="num">${{ "%.4f"|format(row.spend or 0) }}</td>
+          <td class="num">{{ row.duration_ms }}ms</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
