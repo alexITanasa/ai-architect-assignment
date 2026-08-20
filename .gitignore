@@ -45,6 +45,8 @@ logs/
 
 # Ollama models
 models/
+# RAG source books (large binary files, kept in GCS instead)
+rag-ingest/books/
 
 # Node
 node_modules/
