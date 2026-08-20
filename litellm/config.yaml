@@ -1,0 +1,20 @@
+model_list:
+  # ─── Local model via Ollama on host ───
+  - model_name: llama3.2-local
+    litellm_params:
+      model: ollama_chat/llama3.2:3b
+      api_base: http://host.docker.internal:11434
+
+  # ─── Gemini via Vertex AI (adăugăm la Etapa B) ───
+  # - model_name: gemini-flash
+  #   litellm_params:
+  #     model: vertex_ai/gemini-2.0-flash
+  #     vertex_project: os.environ/GCP_PROJECT_ID
+  #     vertex_location: os.environ/GCP_LOCATION
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
