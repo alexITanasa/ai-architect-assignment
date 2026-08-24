@@ -6,16 +6,22 @@ import time
 import vertexai
 from vertexai import rag
 
-
-PROJECT_ID = os.getenv("GCP_PROJECT_ID", "ai-architect-test-506013")
+PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-BUCKET_NAME = os.getenv("GCS_BUCKET", "ai-architect-test-506013-rag-books")
+BUCKET_NAME = os.getenv("GCS_BUCKET")
 CORPUS_DISPLAY_NAME = os.getenv("RAG_CORPUS_DISPLAY_NAME", "books-corpus")
 EMBEDDING_MODEL = "publishers/google/models/text-embedding-005"
 
 CHUNK_SIZE = 512
 CHUNK_OVERLAP = 100
 
+if not PROJECT_ID:
+    print("ERROR: GCP_PROJECT_ID env var is required", file=sys.stderr)
+    sys.exit(1)
+
+if not BUCKET_NAME:
+    print("ERROR: GCS_BUCKET env var is required", file=sys.stderr)
+    sys.exit(1)
 
 def get_or_create_corpus():
     for corpus in rag.list_corpora():

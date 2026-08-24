@@ -87,9 +87,6 @@ I picked 2.5 Flash because:
 
 Cost isn't the constraint at this scale.
 
-### Two books, not three (Gibbon dropped)
-
-Uploaded three PDFs, but *Decline and Fall of the Roman Empire* (17 MB) failed embedding on ingest. Rather than debug an isolated ingest failure that doesn't teach anything about the architecture, I dropped it and kept Sherlock Holmes + Sherman's Memoirs. Two books are enough for the agent to demonstrate discrimination (queries about detective work land in Holmes, queries about military leadership land in Sherman).
 
 ## Deliberately out of scope
 

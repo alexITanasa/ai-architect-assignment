@@ -6,11 +6,14 @@ from fastmcp import FastMCP
 import vertexai
 from vertexai import rag
 
-
-PROJECT_ID = os.getenv("GCP_PROJECT_ID", "ai-architect-test-506013")
+PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
 CORPUS_NAME = os.getenv("RAG_CORPUS_NAME")
 DEFAULT_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
+
+if not PROJECT_ID:
+    print("ERROR: GCP_PROJECT_ID env var is required", file=sys.stderr)
+    sys.exit(1)
 
 if not CORPUS_NAME:
     print("ERROR: RAG_CORPUS_NAME env var is required", file=sys.stderr)
