@@ -1,6 +1,6 @@
 # AI Architect Assignment
 
-A small but complete local AI stack: chat interface, model gateway, cost tracking, RAG knowledge base, and an agent that answers grounded questions about books.
+AI stack: chat interface, model gateway, cost tracking, RAG knowledge base, and an agent that answers grounded questions about books.
 
 Everything runs from a single `docker compose up` after prerequisites and credentials are in place.
 
