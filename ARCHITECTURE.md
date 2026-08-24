@@ -2,7 +2,7 @@
 
 ## Overview
 
-Six containers plus one process on the host, wired through a single Docker Compose network. `docker compose up` brings the whole stack alive after `.env` is populated.
+Six runtime containers plus one process on the host, wired through a single Docker Compose network. `docker compose up` brings the runtime stack alive after `.env` is populated. RAG corpus provisioning is handled separately through a Docker Compose bootstrap profile.
 
 Two logical planes:
 
@@ -46,6 +46,14 @@ If the extractor ever needed to serve queries at scale (multi-tenant dashboard, 
 By default new GCP projects can't use RAG Engine's Spanner-backed mode in `us-central1` (allowlist only). The alternative is Serverless mode, which is generally available. It uses Vertex AI Vector Search 2.0 under the hood, which is fine for this scale.
 
 Switching modes is a one-time PATCH on `ragEngineConfig`. Documented in the README so the next person doesn't hit the same wall.
+
+### RAG ingestion as a Compose bootstrap profile
+
+RAG ingestion is containerized but kept outside the default runtime startup through a Docker Compose `bootstrap` profile.
+
+The ingest process is a provisioning task rather than a long-running service: it creates or reuses the Vertex AI RAG corpus, imports the source books from GCS, and then exits. Running it on every `docker compose up` would add unnecessary startup time and could repeatedly trigger ingestion work.
+
+Keeping it behind a profile preserves the main runtime flow while still ensuring the ingestion environment is reproducible and does not depend on a locally installed Python environment.
 
 ### MCP over HTTP, not stdio
 
