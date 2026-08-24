@@ -118,6 +118,23 @@ services:
     networks:
       - ai-stack
 
+  rag-ingest:
+    build: ./rag-ingest
+    container_name: rag-ingest
+    profiles:
+      - bootstrap
+    volumes:
+      - ${GCP_KEY_HOST_PATH}:/gcp/gcp-key.json:ro
+    environment:
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GCP_LOCATION=${GCP_LOCATION}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - GCS_BUCKET=${GCS_BUCKET}
+      - RAG_CORPUS_NAME=${RAG_CORPUS_NAME}
+      - RAG_CORPUS_DISPLAY_NAME=books-corpus 
+    networks:
+      - ai-stack
+
 volumes:
   openwebui-data:
   postgres-data:

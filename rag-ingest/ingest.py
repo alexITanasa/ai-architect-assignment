@@ -10,7 +10,7 @@ from vertexai import rag
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "ai-architect-test-506013")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
 BUCKET_NAME = os.getenv("GCS_BUCKET", "ai-architect-test-506013-rag-books")
-CORPUS_DISPLAY_NAME = os.getenv("RAG_CORPUS_NAME", "books-corpus")
+CORPUS_DISPLAY_NAME = os.getenv("RAG_CORPUS_DISPLAY_NAME", "books-corpus")
 EMBEDDING_MODEL = "publishers/google/models/text-embedding-005"
 
 CHUNK_SIZE = 512
